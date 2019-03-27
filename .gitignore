@@ -62,3 +62,5 @@ typings/
 
 # axios swap file
 *.swp
+# vscode
+.vscode
