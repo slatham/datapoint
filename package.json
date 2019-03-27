@@ -1,0 +1,48 @@
+{
+  "name": "@slatham/datapoint",
+  "version": "1.0.0",
+  "description": "Wrapper for the Met Office's datapoint API",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "mocha",
+    "build": "gulp fullBuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slatham/datapoint.git"
+  },
+  "keywords": [
+    "datapoint",
+    "met",
+    "office",
+    "weather",
+    "forecast"
+  ],
+  "author": "S J Latham",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/slatham/datapoint/issues"
+  },
+  "homepage": "https://github.com/slatham/datapoint#readme",
+  "dependencies": {
+    "@slatham/quadtree": "^1.0.5",
+    "axios": "^0.18.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "chai": "^4.2.0",
+    "del": "^4.0.0",
+    "eslint": "^5.15.3",
+    "eslint-config-google": "^0.12.0",
+    "gulp": "^4.0.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-eslint": "^5.0.0",
+    "gulp-insert": "^0.5.0",
+    "gulp-mocha": "^6.0.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-watch": "^5.0.1"
+  }
+}
