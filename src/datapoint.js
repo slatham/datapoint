@@ -1,7 +1,6 @@
 const qtree = require('@slatham/quadtree');
 const settings = require('./settings');
 const axios = require('axios');
-
 /**
  * Describe datapoint class
  */
@@ -17,6 +16,26 @@ class Datapoint {
     this.pointLimit = settings.quadtree.maxPointsPerNode;
     this.forecastSites = new qtree.Quadtree(this.ukArea, this.pointLimit);
     this.observationSites = new qtree.Quadtree(this.ukArea, this.pointLimit);
+    this.ready = false;
+  }
+  /**
+   * Set up the class ready
+   * for use by pre-loading site lists
+   * @param {function} cb
+   */
+  async init(cb) {
+    if (!this.ready) {
+      this.ready = true;
+      await this._queryForecastSites().catch((err) => {
+        this.ready = false;
+        console.log(err);
+      });
+      await this._queryObservationSites().catch((err) => {
+        this.ready = false;
+        console.log(err);
+      });
+    }
+    cb(this.ready);
   }
   /**
    * Pull all the forecast sites
@@ -34,7 +53,7 @@ class Datapoint {
         const point = new qtree.Point(loc.longitude, loc.latitude, loc);
         this.forecastSites.insertPoint(point);
       });
-    }).catch((err) => {console.log(err)});
+    });
   }
   /**
    * Pull all the observation sites
@@ -52,7 +71,7 @@ class Datapoint {
         const point = new qtree.Point(loc.longitude, loc.latitude, loc);
         this.observationSites.insertPoint(point);
       });
-    }).catch((err) => {console.log(err)});
+    });
   }
   /**
    * Query the datapoint API for
@@ -76,18 +95,20 @@ class Datapoint {
    * data is available
    * @return {Set}
    */
-  async getAllForecastSites() {
-    await this._queryForecastSites();
-    return this.forecastSites.queryPoints();
+  getAllForecastSites() {
+    if (this.ready) {
+      return this.forecastSites.queryPoints();
+    }
   }
   /**
    * Get a list of all the sites where observation
    * data is available
    * @return {Set}
    */
-  async getAllObservationSites() {
-    await this._queryObservationSites();
-    return this.observationSites.queryPoints();
+  getAllObservationSites() {
+    if (this.ready) {
+      return this.observationSites.queryPoints();
+    }
   }
   /**
    * Get nearest site to a given location
@@ -122,7 +143,9 @@ class Datapoint {
    * @return {Promise}
    */
   async getForecast(siteId, resolution) {
-   return await this._querySiteForecast(siteId, resolution);
+    if (this.ready) {
+      return await this._querySiteForecast(siteId, resolution);
+    }
   }
 }
 module.exports = Datapoint;
