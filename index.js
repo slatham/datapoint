@@ -16,7 +16,7 @@ dp.init((ready) => {
     // get forecast sites within given area
     const areaSize = 0.1;
     const location = {lat: 53.430828, lon: -2.960830};
-    console.log(dp.getNearbyForecastSites(location, areaSize));
+    console.log(dp.getNearbyForecastSites(location, areaSize).size);
   }
 });
 
@@ -25,12 +25,12 @@ dp.init((ready) => {
 // you must wrap any calls in an init() call, though.
 // that way it ensures initialisation has successfully
 // completed
-dp.init(() => {
-  // get forecast data for a given site
-  dp.getForecast(322315, '3hourly').then((forecast) => {
-    console.log(forecast);
-  });
-});
+// dp.init(() => {
+//   // get forecast data for a given site
+//   dp.getForecast(322315, '3hourly').then((forecast) => {
+//     console.log(forecast);
+//   });
+// });
 
 // failure do do so could result in either
 // being returned undefined or no results
@@ -38,7 +38,15 @@ dp.init(() => {
 
 
 
-dp.getNearestForecastSite();
+
+dp.init((ready) => {
+  if (ready) {
+    // cilliau Aeron
+    const location = {latitude:52.543741, longitude: -4.052158};
+    console.log(dp.getNearestForecastSite(location));
+  }
+});
+
 
 dp.getNearestObservationSite();
 

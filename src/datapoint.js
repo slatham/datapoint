@@ -1,6 +1,7 @@
 const qtree = require('@slatham/quadtree');
 const settings = require('./settings');
 const axios = require('axios');
+const haversine = require('haversine');
 /**
  * Describe datapoint class
  */
@@ -17,6 +18,7 @@ class Datapoint {
     this.forecastSites = new qtree.Quadtree(this.ukArea, this.pointLimit);
     this.observationSites = new qtree.Quadtree(this.ukArea, this.pointLimit);
     this.ready = false;
+    this.areaIncrementSize = settings.quadtree.areaIncrementSize;
   }
   /**
    * Set up the class ready
@@ -25,7 +27,7 @@ class Datapoint {
    */
   async init(cb) {
     if (!this.ready) {
-      this.ready = true;
+      
       await this._queryForecastSites().catch((err) => {
         this.ready = false;
         console.log(err);
@@ -35,6 +37,8 @@ class Datapoint {
         console.log(err);
       });
     }
+    this.ready = true;
+    console.log('ready...');
     cb(this.ready);
   }
   /**
@@ -91,6 +95,26 @@ class Datapoint {
     }).catch((err) => {console.log(err)});
   }
   /**
+   * use haversine to find nearest site
+   * @param {Object} location
+   * @param {Set} locations
+   * @return {Set}
+   */
+  _findNearest(location, locations) {
+    let nearest;
+    let distance;
+    locations.forEach((loc) => {
+      const newDistance = haversine(location,
+          {latitude: loc.data.latitude, longitude: loc.data.longitude});
+      if (newDistance < distance || typeof distance === 'undefined') {
+        distance = newDistance;
+        nearest = loc;
+      }
+    });
+
+    return new Set().add(nearest);
+  }
+  /**
    * Get a list of all the sites where forecast
    * data is available
    * @return {Set}
@@ -119,14 +143,30 @@ class Datapoint {
   }
   /**
    * Get the nearest site to a give location
-   * @param {Object} location
+   * @param {Object} loc
+   * @param {Float} size
+   * @return {Set}
    */
-  getNearestForecastSite(location) {
-    // not yet implemented
+  getNearestForecastSite(loc, size = 0) {
+    const queryArea = new qtree.Area(loc.longitude, loc.latitude, size, size);
+    const results = this.forecastSites.queryPoints(queryArea);
+    // early return bit base case
+    if (results.size === 1) {
+      return results;
+    }
+    // return nearest
+    if (results.size > 0) {
+      return this._findNearest(loc, results);
+    }
+    // recursive bit
+    if (results.size === 0) {
+      size += this.areaIncrementSize;
+      return this.getNearestForecastSite(loc, size);
+    }
   }
   /**
    * Get the nearest sites based on a location
-   * @param {Object} loc 
+   * @param {Object} loc
    * @param {Float} size
    * Should return an object containing a Set() of points
    * for NE, NW, SE, SW surrounding the location
