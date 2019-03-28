@@ -126,13 +126,16 @@ class Datapoint {
   }
   /**
    * Get the nearest sites based on a location
-   * @param {Object} location 
+   * @param {Object} loc 
+   * @param {Float} size
    * Should return an object containing a Set() of points
    * for NE, NW, SE, SW surrounding the location
    * so {NW: Set(), NE: Set()...}
+   * @return {Set}
    */
-  getNearbyForecastSites(location) {
-    // not yet implemented
+  getNearbyForecastSites(loc, size) {
+    const queryArea = new qtree.Area(loc.lon, loc.lat, size, size);
+    return this.forecastSites.queryPoints(queryArea);
   }
 
   /**

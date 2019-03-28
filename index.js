@@ -10,15 +10,17 @@ dp.init((ready) => {
   // worked okay.
   if (ready) {
     // return a Set() of all forecast sites
-    console.log(dp.getAllForecastSites());
+    console.log(`Number of all forecast sites = ${dp.getAllForecastSites().size}`);
     // return a Set() of all observation sites
-    console.log(dp.getAllObservationSites());
+    console.log(`Number of all observation sites = ${dp.getAllObservationSites().size}`);
+    // get forecast sites within given area
+    const areaSize = 0.1;
+    const location = {lat: 53.430828, lon: -2.960830};
+    console.log(dp.getNearbyForecastSites(location, areaSize));
   }
 });
 
-dp.getForecast(322315, '3hourly').then((forecast) => {
-  console.log(forecast);
-});
+
 
 // you must wrap any calls in an init() call, though.
 // that way it ensures initialisation has successfully
@@ -32,9 +34,9 @@ dp.init(() => {
 
 // failure do do so could result in either
 // being returned undefined or no results
-console.log(dp.getAllForecastSites());
+//console.log(dp.getAllForecastSites());
 
-dp.getNearbyForecastSites();
+
 
 dp.getNearestForecastSite();
 
