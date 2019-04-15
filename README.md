@@ -15,29 +15,35 @@ npm install @slatham/datapoint
 Include in your node project
 ```javascript
 // import the module
-const dp = require('@slatham/datapoint');
+const datapoint = require('@slatham/datapoint');
 ```
-### Set your API key
-Define your datapoint API key.  You can register for a key [here](https://register.metoffice.gov.uk/WaveRegistrationClient/public/register.do?service=datapoint)
+### Set up
+Define your datapoint API key while instantiating a new Datapoint object.  You can register for a key [here](https://register.metoffice.gov.uk/WaveRegistrationClient/public/register.do?service=datapoint)
 ```javascript
-// define your API Key (required)
-dp.apiKey = 'this-is-where-your-key-goes';
-```
-### Specify data type
-Optionally, you can specify the type of weather data you want to retrieve from the datapoint API.  You have only two options - ```'forecast'``` or ```'observations'```.  By default, ```'forecast'``` is set.
-```javascript
-// set the data type to pull from datapoint
-dp.type = 'forecast';
-```
-### Specify the time resolution
-Optionally, you can set the time period for data.  You only have two options for this - ```'3hourly'``` or ```'daily'```.  The default here is ```'daily'```.
-```javascript
-// set time resolution
-dp.resolution = '3hourly';
+const apiKey = xxxx-xxxx-xxxx-xxxx-xxxx-xxxx
+const dp = new datapoint(apiKey);
 ```
 
-### Get all sites
-Retrieve a full listing of all sites (locations) in the UK that are covered.  Note if you have the data type set to ```'forecast'``` that will be a listing of over 5000 sites!  There are fewer sites available for observations.  This is an async operation so you are returned a Promise.  The data returned contains a site id.  A site id is needed so as you can request a weather forecast for that site id.
+### Initialise
+Before using any of the datapoint functionality you must first run the init() function.  This is an async operation with a callback function passed as the argument.  When called, the datapoint api will be queried for all forecast and observation sites.  It will then store these sites in 2 seperate quadtrees - one for forecast sites and one for observation sites.  This is because these lists rarely change so it saves multiple async calls to the datapoint api for the same data.  Also, as the locations are stored in a quadtree data structure they're organised based on their location.  This makes queries for nearby sites more efficient.  It is recomended to run any call to datapoint in the callback function of the init() function call.  That way you'll be sure everything is set up and ready. 
+```javascript
+dp.init((ready) => {
+  // YOUR CODE GOES HERE
+});
+```
+You could even test if everything is working and no errors have occured during initialisation
+```javascript
+dp.init((ready) => {
+  if(ready) {
+    // YOUR CODE GOES HERE
+  } else {
+    // SOMETHING HAS GONE WRONG
+  }
+});
+````
+
+### Get all forecast sites
+Retrieve a full listing of all forecast sites (locations) in the UK that are covered.  Note that will be a listing of over 5000 sites!  This is an async operation so you are returned a Promise.  The data returned contains a site id.  A site id is needed so as you can request a weather forecast for that site id.
 ```javascript
 dp.siteList().then((sites) => {
   console.log(sites);
