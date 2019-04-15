@@ -1,4 +1,4 @@
-const datapoint = require('./src/datapoint');
+const datapoint = require('./build/index');
 require('dotenv').config();
 const apiKey = process.env.DATAPOINT_API_KEY;
 
@@ -15,7 +15,7 @@ dp.init((ready) => {
     console.log(`Number of all observation sites = ${dp.getAllObservationSites().size}`);
     // get forecast sites within given area
     const areaSize = 0.1;
-    const location = {lat: 53.430828, lon: -2.960830};
+    const location = {latitude: 53.430828, longitude: -2.960830};
     console.log(dp.getNearbyForecastSites(location, areaSize).size);
   }
 });
@@ -44,10 +44,11 @@ dp.init((ready) => {
     // cilliau Aeron
     const location = {latitude:52.543741, longitude: -4.052158};
     console.log(dp.getNearestForecastSite(location));
+    console.log(dp.getNearestObservationSite(location));
   }
 });
 
 
-dp.getNearestObservationSite();
+
 
 

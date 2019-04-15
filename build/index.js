@@ -1,10 +1,37 @@
-const qtree = require('@slatham/quadtree');
-const settings = require('./settings');
+/** Author: S Latham */
+
 const axios = require('axios');
+const qtree = require('@slatham/quadtree');
 const haversine = require('haversine');
+
+const settings = {
+  'quadtree': {
+    'ukBoundingArea': [-10, 50, 12, 10],
+    'maxPointsPerNode': 10,
+    'areaIncrementSize': 0.1
+  },
+  'datapoint': {
+    'baseURL': 'http://datapoint.metoffice.gov.uk/public/data/',
+    'timeout': 10000,
+    'forecastPath': 'val/wxfcs/all/json/',
+    'observationPath': 'val/wxobs/all/json/'
+  }
+};
+
+//# sourceMappingURL=settings.js.map
+
+
+
+
+
+
+
+
 /**
  * Describe datapoint class
  */
+
+
 class Datapoint {
   /**
    * Set up the datapoint object
@@ -25,19 +52,20 @@ class Datapoint {
    * for use by pre-loading site lists
    * @param {function} cb
    */
+
+
   async init(cb) {
     if (!this.ready) {
-      await this._queryForecastSites().catch((err) => {
-        this.ready = false;
-        // console.log(err);
+      await this._queryForecastSites().catch(err => {
+        this.ready = false; // console.log(err);
       });
-      await this._queryObservationSites().catch((err) => {
-        this.ready = false;
-        // console.log(err);
+      await this._queryObservationSites().catch(err => {
+        this.ready = false; // console.log(err);
       });
     }
-    this.ready = true;
-    // console.log('ready...');
+
+    this.ready = true; // console.log('ready...');
+
     cb(this.ready);
   }
   /**
@@ -45,14 +73,17 @@ class Datapoint {
    * from the datapoint API
    * @return {Promise}
    */
+
+
   _queryForecastSites() {
-    return axios.get(
-        settings.datapoint.forecastPath + 'sitelist',
-        {baseURL: settings.datapoint.baseURL,
-          params: {key: this.apiKey},
-          timeout: settings.datapoint.timeout}
-    ).then((response) => {
-      response.data.Locations.Location.forEach((loc) => {
+    return axios.get(settings.datapoint.forecastPath + 'sitelist', {
+      baseURL: settings.datapoint.baseURL,
+      params: {
+        key: this.apiKey
+      },
+      timeout: settings.datapoint.timeout
+    }).then(response => {
+      response.data.Locations.Location.forEach(loc => {
         const point = new qtree.Point(loc.longitude, loc.latitude, loc);
         this.forecastSites.insertPoint(point);
       });
@@ -63,14 +94,17 @@ class Datapoint {
    * from the datapoint API
    * @return {Promise}
    */
+
+
   _queryObservationSites() {
-    return axios.get(
-        settings.datapoint.observationPath + 'sitelist',
-        {baseURL: settings.datapoint.baseURL,
-          params: {key: this.apiKey},
-          timeout: settings.datapoint.timeout}
-    ).then((response) => {
-      response.data.Locations.Location.forEach((loc) => {
+    return axios.get(settings.datapoint.observationPath + 'sitelist', {
+      baseURL: settings.datapoint.baseURL,
+      params: {
+        key: this.apiKey
+      },
+      timeout: settings.datapoint.timeout
+    }).then(response => {
+      response.data.Locations.Location.forEach(loc => {
         const point = new qtree.Point(loc.longitude, loc.latitude, loc);
         this.observationSites.insertPoint(point);
       });
@@ -83,15 +117,19 @@ class Datapoint {
    * @param {String} resolution
    * @return {Object}
    */
+
+
   _querySiteForecast(siteId, resolution) {
-    return axios.get(
-        settings.datapoint.forecastPath + siteId,
-        {baseURL: settings.datapoint.baseURL,
-          params: {res: resolution, key: this.apiKey},
-          timeout: settings.datapoint.timeout}
-    ).then((response) => {
+    return axios.get(settings.datapoint.forecastPath + siteId, {
+      baseURL: settings.datapoint.baseURL,
+      params: {
+        res: resolution,
+        key: this.apiKey
+      },
+      timeout: settings.datapoint.timeout
+    }).then(response => {
       return response.data.SiteRep;
-    }).catch((err) => err);
+    }).catch(err => err);
   }
   /**
    * use haversine to find nearest site
@@ -99,18 +137,22 @@ class Datapoint {
    * @param {Set} locations
    * @return {Set}
    */
+
+
   _findNearest(location, locations) {
     let nearest;
     let distance;
-    locations.forEach((loc) => {
-      const newDistance = haversine(location,
-          {latitude: loc.data.latitude, longitude: loc.data.longitude});
+    locations.forEach(loc => {
+      const newDistance = haversine(location, {
+        latitude: loc.data.latitude,
+        longitude: loc.data.longitude
+      });
+
       if (newDistance < distance || typeof distance === 'undefined') {
         distance = newDistance;
         nearest = loc;
       }
     });
-
     return new Set().add(nearest);
   }
   /**
@@ -118,6 +160,8 @@ class Datapoint {
    * data is available
    * @return {Set}
    */
+
+
   getAllForecastSites() {
     if (this.ready) {
       return this.forecastSites.queryPoints();
@@ -128,6 +172,8 @@ class Datapoint {
    * data is available
    * @return {Set}
    */
+
+
   getAllObservationSites() {
     if (this.ready) {
       return this.observationSites.queryPoints();
@@ -139,18 +185,22 @@ class Datapoint {
    * @param {int} size
    * @return {Set}
    */
+
+
   getNearestObservationSite(loc, size = 0) {
     const queryArea = new qtree.Area(loc.longitude, loc.latitude, size, size);
-    const results = this.observationSites.queryPoints(queryArea);
-    // early return bit base case
+    const results = this.observationSites.queryPoints(queryArea); // early return bit base case
+
     if (results.size === 1) {
       return results;
-    }
-    // return nearest
+    } // return nearest
+
+
     if (results.size > 0) {
       return this._findNearest(loc, results);
-    }
-    // recursive bit
+    } // recursive bit
+
+
     if (results.size === 0) {
       size += this.areaIncrementSize;
       return this.getNearestObservationSite(loc, size);
@@ -162,18 +212,22 @@ class Datapoint {
    * @param {Float} size
    * @return {Set}
    */
+
+
   getNearestForecastSite(loc, size = 0) {
     const queryArea = new qtree.Area(loc.longitude, loc.latitude, size, size);
-    const results = this.forecastSites.queryPoints(queryArea);
-    // early return bit base case
+    const results = this.forecastSites.queryPoints(queryArea); // early return bit base case
+
     if (results.size === 1) {
       return results;
-    }
-    // return nearest
+    } // return nearest
+
+
     if (results.size > 0) {
       return this._findNearest(loc, results);
-    }
-    // recursive bit
+    } // recursive bit
+
+
     if (results.size === 0) {
       size += this.areaIncrementSize;
       return this.getNearestForecastSite(loc, size);
@@ -186,11 +240,12 @@ class Datapoint {
    * Should return an object containing a Set() of points
    * @return {Set}
    */
+
+
   getNearbyForecastSites(loc, size) {
     const queryArea = new qtree.Area(loc.longitude, loc.latitude, size, size);
     return this.forecastSites.queryPoints(queryArea);
   }
-
   /**
    * Get a forecast for
    * a given site
@@ -198,10 +253,19 @@ class Datapoint {
    * @param {String} resolution
    * @return {Promise}
    */
+
+
   async getForecast(siteId, resolution) {
     if (this.ready) {
       return await this._querySiteForecast(siteId, resolution);
     }
   }
+
 }
-module.exports = Datapoint;
+
+
+//# sourceMappingURL=datapoint.js.map
+
+if (typeof module !== 'undefined') {
+	module.exports = Datapoint;
+	}

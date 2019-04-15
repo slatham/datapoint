@@ -16,7 +16,7 @@ function stream() {
 }
 
 function getHeader() {
-  return `/** Author: S Latham */\n\nconst axios = require('axios');\nconst qt = require('@slatham/quadtree');`;
+  return `/** Author: S Latham */\n\nconst axios = require('axios');\nconst qtree = require('@slatham/quadtree');\nconst haversine = require('haversine');\n\n`;
 }
 
 function clean() {
@@ -45,7 +45,7 @@ function test() {
 }
 
 function build() {
-  return gulp.src([`${compileDir}/settings.js`, `${compileDir}/validate.js`, `${compileDir}/api.js`, `${compileDir}/datapoint.js`])	// compile dir
+  return gulp.src([`${compileDir}/settings.js`, `${compileDir}/datapoint.js`])	// compile dir
 	.pipe(concat('index.js'))		// concat all js file into one file
 	.pipe(gulp.dest(buildDir))		// store in the build directory
 };
@@ -62,7 +62,7 @@ function transform() {
 
 function getExport() {
   return `\nif (typeof module !== 'undefined') {
-	module.exports = dataPoint;
+	module.exports = Datapoint;
 	}`
 }
 
