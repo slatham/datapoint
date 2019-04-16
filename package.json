@@ -25,14 +25,13 @@
   },
   "homepage": "https://github.com/slatham/datapoint#readme",
   "dependencies": {
-    "@babel/core": "^7.4.3",
     "@slatham/quadtree": "^1.0.5",
     "axios": "^0.18.0",
-    "dotenv": "^7.0.0",
     "haversine": "^1.1.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "@babel/core": "^7.4.3",
     "babel-core": "^6.26.3",
     "babel-preset-es2015": "^6.24.1",
     "chai": "^4.2.0",
