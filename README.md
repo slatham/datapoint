@@ -56,18 +56,17 @@ dp.init((ready) => {
 ```
 
 ### Get nearby forecast sites
-Retrieve a list of nearby forecast locations rather than a full listing.  
+Retrieve a list of nearby forecast locations rather than a full listing.  See [Wikipedia](https://en.wikipedia.org/wiki/Decimal_degrees) precision table for a guide on setting the area size for the search.
 ```javascript
-// need a location with latitude / longitude and the minimum amount of sites you want back from the query
+// location to centre the search around
 const location = {latitude: 53.430828, longitude: -2.960830};
 // set a size for the area to search
-// see [Wikipedia](https://en.wikipedia.org/wiki/Decimal_degrees) precision table for a guide on setting this.
 const areaSize = 0.1; // decimal degrees
 dp.init((ready) => {
-  const nearbySites = dp.getNearbyForecastSites(locationm areaSize);
+  const nearbySites = dp.getNearbyForecastSites(location, areaSize);
 });
 ```
-This query for nearby sites uses a [quadtree](https://github.com/slatham/quadtree) data structure for fast retrival.  Once init() has run these queries do not hit your datapoint api quota.
+The queries for nearby sites uses a [quadtree](https://github.com/slatham/quadtree) data structure for fast retrival.  Once init() has run these queries do not hit your datapoint api quota.
 
 ### Get nearest forecast site
 Given a coordinate, find the nearest forecast site.  You will have a Set() containing a single item returned.
@@ -104,7 +103,7 @@ dp.init((ready) => {
 ### Get observations
 Pull weather observations for a given site.  Remember, you'll have to query for the site id before you can get a forecast or observation.  Also, the site ID for a forecast location isn't the same as an ID for an observations site.  You'll have to query for them as decribed above.  You can pull hourly observations for the last 24 hours from the api.  The only parameter is the ID of the site you're interested in.
 ```javascript
-const siteId = 322315;
+const siteId = 3503;
 dp.init((ready) => {
   // get the observations for the site
   dp.getObservations(siteId).then((observation) => {
@@ -112,19 +111,33 @@ dp.init((ready) => {
   });
 });
 ```
-Note: The get
+Note: The getForecast() and getObservation() are async and return a Promise.  This mean you can use "then" and "catch" to handle the promise.
+
+## Examples
+
+Some full examples to understand usage more fully
 
 ### Get forecasts or observations for nearby sites
-Combine the above to firstly find nearby sites, then use their IDs to pull the weather for them.
+Pull the daily forecasts for all nearby sites to a location for a given search area.
 ```javascript
-// set a location with latitude / longitude and the minimum amount of sites you want back from the query
-const location = {lat:53.430828, lon:-2.960830, minimum:10};
-dp.siteList(location).then((sites) => {
-  sites.forEach((site) => {
-    dp.forecast(site.data.id).then((weather) => {
-      console.log(forecast.forecast);
+// import the module
+const datapoint = require('@slatham/datapoint');
+// set API key
+const apiKey = xxxx-xxxx-xxxx-xxxx-xxxx-xxxx
+// instantiate a datapoint object
+const dp = new datapoint(apiKey);
+// location to centre the search around
+const location = {latitude: 53.430828, longitude: -2.960830};
+// set a size for the area to search
+const areaSize = 0.1; // decimal degrees
+dp.init((ready) => {
+  const nearbySites = dp.getNearbyForecastSites(location, areaSize);
+  nearbySites.forEach((site) => {
+    dp.getForecast(site.data.id, 'daily').then((forecast) => {
+      console.log(forecast)
     });
-  });
+  })
 });
+
 ```
 __Careful with this - don't try to query hundreds of sites at once for weather or you'll have your API key blocked for 24 hours!__
