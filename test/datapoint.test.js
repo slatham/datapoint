@@ -67,4 +67,10 @@ describe('# Datapoint', () => {
       expect(forecast.DV.type).to.equal('Forecast');  
     });
   });
+  it('# getObservations(siteId) - Should return observations', () => {
+    return dp.getObservations(3503).then((observation) => {
+      expect(typeof observation).to.equal('object');
+      expect(observation.DV.type).to.equal('Obs');
+    });
+  });
 });

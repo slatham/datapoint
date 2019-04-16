@@ -37,8 +37,6 @@ dp.init((ready) => {
 //console.log(dp.getAllForecastSites());
 
 
-
-
 dp.init((ready) => {
   if (ready) {
     // cilliau Aeron
@@ -49,6 +47,12 @@ dp.init((ready) => {
 });
 
 
-
-
-
+dp.init((ready) => {
+  // cilliau Aeron
+  const location = {latitude:52.543741, longitude: -4.052158};
+  const site = dp.getNearestObservationSite(location);
+  const siteId = site.values().next().value.data.id;
+  dp.getObservations(siteId).then((observation) => {
+    console.log(observation);
+  });
+});
