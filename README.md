@@ -117,7 +117,7 @@ Note: The getForecast() and getObservation() are async and return a Promise.  Th
 
 Some full examples to understand usage more fully
 
-### Get forecasts or observations for nearby sites
+### Get forecasts for nearby sites
 Pull the daily forecasts for all nearby sites to a location for a given search area.
 ```javascript
 // import the module
