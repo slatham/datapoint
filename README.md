@@ -1,7 +1,5 @@
-# data-point
+# datapoint
 Wrapper for the Met Office's DataPoint API - [DataPoint](https://www.metoffice.gov.uk/datapoint)
-
-For use in node projects
 
 ## Usage
 
@@ -17,7 +15,7 @@ Include in your node project
 // import the module
 const datapoint = require('@slatham/datapoint');
 ```
-### Set up
+### Setup
 Define your datapoint API key while instantiating a new Datapoint object.  You can register for a key [here](https://register.metoffice.gov.uk/WaveRegistrationClient/public/register.do?service=datapoint)
 ```javascript
 const apiKey = xxxx-xxxx-xxxx-xxxx-xxxx-xxxx
@@ -25,13 +23,13 @@ const dp = new datapoint(apiKey);
 ```
 
 ### Initialise
-Before using any of the datapoint functionality you must first run the init() function.  This is an async operation with a callback function passed as the argument.  When called, the datapoint api will be queried for all forecast and observation sites.  It will then store these sites in 2 seperate quadtrees - one for forecast sites and one for observation sites.  This is because these lists rarely change so it saves multiple async calls to the datapoint api for the same data.  Also, as the locations are stored in a quadtree data structure they're organised based on their location.  This makes queries for nearby sites more efficient.  It is recomended to run any call to datapoint in the callback function of the init() function call.  That way you'll be sure everything is set up and ready. 
+Before using any of the datapoint functionality you must first run the init() function.  This is an async operation with a callback function passed as the argument.  When called, the datapoint api will be queried for all forecast and observation sites.  It will then store these sites in 2 separate quadtrees - one for forecast sites and one for observation sites.  This is because these lists rarely change so it saves multiple async calls to the datapoint api for the same data.  Also, as the locations are stored in a quadtree data structure they're organised based on their location.  This makes queries for nearby sites more efficient.  It is recommended to run any call to datapoint in the callback function of the init() function call.  That way you'll be sure everything is set up and ready. 
 ```javascript
 dp.init((ready) => {
   // YOUR CODE GOES HERE
 });
 ```
-You could even test if everything is working and no errors have occured during initialisation
+You could even test if everything is working and no errors have occurred during initialisation
 ```javascript
 dp.init((ready) => {
   if(ready) {
@@ -43,15 +41,22 @@ dp.init((ready) => {
 ````
 
 ### Get all forecast sites
-Retrieve a full listing of all forecast sites (locations) in the UK that are covered.  Note that will be a listing of over 5000 sites!  This is an async operation so you are returned a Promise.  The data returned contains a site id.  A site id is needed so as you can request a weather forecast for that site id.
+Retrieve a full listing of all forecast sites (locations) in the UK that are covered.  Note that will be a listing of over 5000 sites!  The data returned contains a site id.  A site id is needed so as you can request a weather forecast for that site id.
 ```javascript
-dp.siteList().then((sites) => {
-  console.log(sites);
+dp.init((ready) => {
+  const allSites = dp.getAllForecastSites();
+});
+```
+### Get all observation sites
+Retrieve a full listing of all observation sites (locations) in the UK that are covered.  Note that will be a listing of over 140 sites - much less than the forecast sites  The data returned contains a site id.  A site id is needed so as you can request observations for that site id.
+```javascript
+dp.init((ready) => {
+  const allSites = dp.getAllObservationSites();
 });
 ```
 
-### Get nearby sites
-Retrieve a list of nearby locations rather than a full listing.  You do this by simply adding an argument to the above ```'siteList() '``` function.
+### Get nearby forecast sites
+Retrieve a list of nearby forecast locations rather than a full listing.  
 ```javascript
 // set a location with latitudem longitude and the minimum amount of sites you want back from the query
 const location = {lat:53.430828, lon:-2.960830, minimum:10};
@@ -74,7 +79,7 @@ dp.forecast(siteID).then((weather) => {
 ### Get forecasts or observations for nearby sites
 Combine the above to firstly find nearby sites, then use their IDs to pull the weather for them.
 ```javascript
-// set a location with latitudem longitude and the minimum amount of sites you want back from the query
+// set a location with latitude / longitude and the minimum amount of sites you want back from the query
 const location = {lat:53.430828, lon:-2.960830, minimum:10};
 dp.siteList(location).then((sites) => {
   sites.forEach((site) => {
