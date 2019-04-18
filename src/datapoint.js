@@ -11,8 +11,8 @@ class Datapoint {
    * set the API key
    * @param {String} apiKey
    */
-  constructor(apiKey) {
-    this.apiKey = apiKey;
+  constructor() {
+    this.apiKey = '';
     this.ukArea = new qtree.Rectangle(...settings.quadtree.ukBoundingArea);
     this.pointLimit = settings.quadtree.maxPointsPerNode;
     this.forecastSites = new qtree.Quadtree(this.ukArea, this.pointLimit);
@@ -23,10 +23,12 @@ class Datapoint {
   /**
    * Set up the class ready
    * for use by pre-loading site lists
-   * @param {function} cb
+   * @param {String} apiKey
+   * @param {Function} cb
    */
-  async init(cb) {
+  async init(apiKey, cb) {
     if (!this.ready) {
+      this.apiKey = apiKey;
       await this._queryForecastSites().catch((err) => {
         this.ready = false;
         // console.log(err);
@@ -227,4 +229,4 @@ class Datapoint {
     return await this._querySiteObservations(siteId);
   }
 }
-module.exports = Datapoint;
+module.exports = new Datapoint();

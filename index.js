@@ -1,11 +1,9 @@
-const datapoint = require('./build/index');
+const dp = require('./build/index');
 require('dotenv').config();
 const apiKey = process.env.DATAPOINT_API_KEY;
 
-// instantiate a new datapoint object
-const dp = new datapoint(apiKey);
 // initialise datapoint
-dp.init((ready) => {
+dp.init(apiKey, (ready) => {
   // optionally, you can check if initialisation
   // worked okay.
   if (ready) {
@@ -37,7 +35,7 @@ dp.init((ready) => {
 //console.log(dp.getAllForecastSites());
 
 
-dp.init((ready) => {
+dp.init(apiKey, (ready) => {
   if (ready) {
     // cilliau Aeron
     const location = {latitude:52.543741, longitude: -4.052158};
@@ -47,7 +45,7 @@ dp.init((ready) => {
 });
 
 
-dp.init((ready) => {
+dp.init(apiKey, (ready) => {
   // cilliau Aeron
   const location = {latitude:52.543741, longitude: -4.052158};
   const site = dp.getNearestObservationSite(location);

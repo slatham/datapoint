@@ -62,7 +62,7 @@ function transform() {
 
 function getExport() {
   return `\nif (typeof module !== 'undefined') {
-	module.exports = Datapoint;
+	module.exports = new Datapoint();
 	}`
 }
 

@@ -1,8 +1,7 @@
-const datapoint = require('../build/index');
+const dp = require('../build/index');
 const expect = require('chai').expect;
 require('dotenv').config();
 const apiKey = process.env.DATAPOINT_API_KEY;
-const dp = new datapoint(apiKey);
 const location = {latitude: 52.543741, longitude: -4.052158};
 const areaSize = 0.1;
 
@@ -22,7 +21,7 @@ const locations = [
 describe('# Datapoint', () => {
 
   beforeEach((done) => {
-    dp.init((ready) => {
+    dp.init(apiKey, (ready) => {
       if (ready) {
         done();
       }
