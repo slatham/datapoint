@@ -1,6 +1,6 @@
 {
   "name": "@slatham/datapoint",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Wrapper for the Met Office's datapoint API",
   "main": "build/index.js",
   "scripts": {
